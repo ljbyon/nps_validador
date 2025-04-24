@@ -1,20 +1,42 @@
-import streamlit as st
+def normalize_text(text):
+    """Convert text to lowercase and remove accents."""
+    if not isinstance(text, str):
+        return text
+    # Convert to lowercase
+    text = text.lower()
+    # Remove accents (normalize to NFKD form and keep only ASCII chars)
+    text = ''.join(c for c in unicodedata.normalize('NFKD', text)
+                  if not unicodedata.combining(c))
+    return text
+
+def normalize_data(data_dict):
+    """Normalize all text in the data dictionary (keys and values)."""
+    normalized_dict = {}
+    for key, values in data_dict.items():
+        # Normalize the key (filename)
+        normalized_key = normalize_text(key)
+        # Normalize each value in the list
+        normalized_values = [normalize_text(value) for value in values]
+        normalized_dict[normalized_key] = normalized_values
+    return normalized_dictimport streamlit as st
 import json
 import pandas as pd
 import numpy as np
 from io import StringIO
+import unicodedata
+import re
 
-st.set_page_config(page_title="Evaluador de Categorias de Retroalimentacion NPS", layout="wide")
+st.set_page_config(page_title="Evaluador de Clasificación Multi-Etiqueta", layout="wide")
 
-st.title("Evaluador de Categorias de Retroalimentacion NPS")
-st.write("Suba los valores reales y los valores inferidos para calcular las métricas de precision y recall.")
+st.title("Evaluador de Clasificación Multi-Etiqueta")
+st.write("Suba los valores reales y los valores predichos para calcular las métricas de precision y recall.")
 
 # File uploaders
 col1, col2 = st.columns(2)
 with col1:
     actual_file = st.file_uploader("Subir Valores Reales (JSON)", type=["txt", "json"])
 with col2:
-    predicted_file = st.file_uploader("Subir Valores Inferidos (JSON)", type=["txt", "json"])
+    predicted_file = st.file_uploader("Subir Valores Predichos (JSON)", type=["txt", "json"])
 
 def calculate_metrics(actual_dict, predicted_dict):
     """Calculate precision and recall for each filename and global averages."""
@@ -39,13 +61,13 @@ def calculate_metrics(actual_dict, predicted_dict):
         
         # Store results with user-friendly terminology
         results.append({
-            'Archivo': filename,
-            'Categorias Verdad': list(actual_labels),
-            'Categorias Inferidas': list(predicted_labels),
-            'Total': len(actual_labels),  # Total number of labels in ground truth
-            'Correctas': found_correct,
-            'Incorrectas': found_incorrect,
-            'No Encontradas': not_found,
+            'Filename': filename,
+            'Actual Labels': list(actual_labels),
+            'Predicted Labels': list(predicted_labels),
+            'Total Labels': len(actual_labels),  # Total number of labels in ground truth
+            'Found Correct': found_correct,
+            'Found Incorrect': found_incorrect,
+            'Not Found': not_found,
             'Precision': precision,
             'Recall': recall
         })
@@ -69,6 +91,10 @@ if actual_file and predicted_file:
         actual_dict = json.loads(actual_content)
         predicted_dict = json.loads(predicted_content)
         
+        # Normalize text (to lowercase and remove accents)
+        actual_dict = normalize_data(actual_dict)
+        predicted_dict = normalize_data(predicted_dict)
+        
         # Calculate metrics
         results_df, global_precision, global_recall = calculate_metrics(actual_dict, predicted_dict)
         
@@ -84,7 +110,7 @@ if actual_file and predicted_file:
         st.header("Métricas por Archivo")
         
         # Create a more compact view of the results
-        display_df = results_df[['Archivo', 'Recall', 'Precision']].copy()
+        display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
         # Ensure the display DataFrame maintains the same sorting
         st.dataframe(display_df, use_container_width=True)
         
@@ -102,14 +128,14 @@ if actual_file and predicted_file:
             )
         
         # Add explanation of metrics (permanently visible)
-        st.subheader("Leyenda")
+        st.subheader("Entendiendo las Métricas")
         st.markdown("""
-        * **Total**: Número de categorias en los valores reales
-        * **Correctas**: Categorias inferidas correctamente
-        * **Incorrectas**: Categorias inferidas incorrectamente
-        * **No Encontradas**: Categorias que no se encontraron
-        * **Recall**: Correctas / (Correctas + No Encontradas)
-        * **Precision**: Correctas / (Correctas + Incorrectas)
+        * **Total Labels**: Número de etiquetas en los valores reales
+        * **Found Correct**: Etiquetas predichas correctamente
+        * **Found Incorrect**: Etiquetas predichas incorrectamente
+        * **Not Found**: Etiquetas que debieron ser predichas pero no lo fueron
+        * **Recall**: Found Correct / (Found Correct + Not Found)
+        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
         """)
             
     except Exception as e:
