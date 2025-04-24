@@ -79,6 +79,17 @@ if actual_file and predicted_file:
             st.metric("Global Recall", f"{global_recall:.4f}")
         with metric_col2:
             st.metric("Global Precision", f"{global_precision:.4f}")
+            
+        # Add explanation of metrics (permanently visible)
+        st.subheader("Understanding the Metrics")
+        st.markdown("""
+        * **Total Labels**: Number of labels in the ground truth
+        * **Found Correct**: Labels that were correctly predicted
+        * **Found Incorrect**: Labels that were incorrectly predicted
+        * **Not Found**: Labels that should have been predicted but weren't
+        * **Recall**: Found Correct / (Found Correct + Not Found)
+        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
+        """)
         
         # Display per-filename metrics
         st.header("Per-Filename Metrics")
@@ -89,16 +100,6 @@ if actual_file and predicted_file:
         
         # Detailed view (expandable)
         with st.expander("Show Detailed Analysis"):
-            # Add explanation of terms
-            st.write("""
-            **Understanding the metrics:**
-            - **Total Labels**: Number of labels in the ground truth
-            - **Found Correct**: Labels that were correctly predicted
-            - **Found Incorrect**: Labels that were incorrectly predicted
-            - **Not Found**: Labels that should have been predicted but weren't
-            - **Recall**: Found Correct / (Found Correct + Not Found)
-            - **Precision**: Found Correct / (Found Correct + Found Incorrect)
-            """)
             st.dataframe(results_df, use_container_width=True)
             
             # Download button for results
