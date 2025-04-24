@@ -18,9 +18,7 @@ def normalize_data(data_dict):
         # Normalize each value in the list
         normalized_values = [normalize_text(value) for value in values]
         normalized_dict[normalized_key] = normalized_values
-    return normalized_dict
-    
-import streamlit as st
+    return normalized_dictimport streamlit as st
 import json
 import pandas as pd
 import numpy as np
@@ -44,10 +42,15 @@ def calculate_metrics(actual_dict, predicted_dict):
     """Calculate precision and recall for each filename and global averages."""
     results = []
     
-    # Find all unique filenames across both dictionaries
-    all_filenames = set(actual_dict.keys()) | set(predicted_dict.keys())
+    # Identify filenames that will be excluded (in actual but not in predicted)
+    all_actual_filenames = set(actual_dict.keys())
+    all_predicted_filenames = set(predicted_dict.keys())
+    excluded_filenames = all_actual_filenames - all_predicted_filenames
     
-    for filename in all_filenames:
+    # Only evaluate filenames that exist in the predicted JSON
+    evaluation_filenames = all_predicted_filenames
+    
+    for filename in evaluation_filenames:
         # Get labels for the current filename
         actual_labels = set(actual_dict.get(filename, []))
         predicted_labels = set(predicted_dict.get(filename, []))
@@ -85,7 +88,7 @@ def calculate_metrics(actual_dict, predicted_dict):
     global_precision = results_df['Precision'].mean()
     global_recall = results_df['Recall'].mean()
     
-    return results_df, global_precision, global_recall
+    return results_df, global_precision, global_recall, excluded_filenames
 
 # Process files when both are uploaded
 if actual_file and predicted_file:
@@ -102,7 +105,7 @@ if actual_file and predicted_file:
         predicted_dict = normalize_data(predicted_dict)
         
         # Calculate metrics
-        results_df, global_precision, global_recall = calculate_metrics(actual_dict, predicted_dict)
+        results_df, global_precision, global_recall, excluded_filenames = calculate_metrics(actual_dict, predicted_dict)
         
         # Display global metrics
         st.header("Métricas Globales")
@@ -111,6 +114,12 @@ if actual_file and predicted_file:
             st.metric("Recall Global", f"{global_recall:.4f}")
         with metric_col2:
             st.metric("Precision Global", f"{global_precision:.4f}")
+            
+        # Display excluded filenames
+        if excluded_filenames:
+            st.warning(f"**Archivos Excluidos de la Evaluación:** {len(excluded_filenames)} archivos presentes en los valores reales pero no en las predicciones no fueron evaluados.")
+            with st.expander("Ver Archivos Excluidos"):
+                st.write(", ".join(sorted(excluded_filenames)) if excluded_filenames else "Ninguno")
         
         # Display per-filename metrics
         st.header("Métricas por Archivo")
