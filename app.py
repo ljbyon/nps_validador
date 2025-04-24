@@ -79,17 +79,6 @@ if actual_file and predicted_file:
             st.metric("Global Recall", f"{global_recall:.4f}")
         with metric_col2:
             st.metric("Global Precision", f"{global_precision:.4f}")
-            
-        # Add explanation of metrics (permanently visible)
-        st.subheader("Understanding the Metrics")
-        st.markdown("""
-        * **Total Labels**: Number of labels in the ground truth
-        * **Found Correct**: Labels that were correctly predicted
-        * **Found Incorrect**: Labels that were incorrectly predicted
-        * **Not Found**: Labels that should have been predicted but weren't
-        * **Recall**: Found Correct / (Found Correct + Not Found)
-        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
-        """)
         
         # Display per-filename metrics
         st.header("Per-Filename Metrics")
@@ -110,23 +99,18 @@ if actual_file and predicted_file:
                 file_name="classification_metrics.csv",
                 mime="text/csv"
             )
+        
+        # Add explanation of metrics (permanently visible)
+        st.subheader("Understanding the Metrics")
+        st.markdown("""
+        * **Total Labels**: Number of labels in the ground truth
+        * **Found Correct**: Labels that were correctly predicted
+        * **Found Incorrect**: Labels that were incorrectly predicted
+        * **Not Found**: Labels that should have been predicted but weren't
+        * **Recall**: Found Correct / (Found Correct + Not Found)
+        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
+        """)
             
     except Exception as e:
         st.error(f"Error processing files: {str(e)}")
         st.write("Please ensure the uploaded files contain valid JSON data with the expected format.")
-
-# Show sample format
-with st.expander("Expected Input Format"):
-    st.code('''{
-    "E-927337.mp3": [
-        "Calidad de productos"
-    ],
-    "E-927379.mp3": [
-        "Calidad de productos",
-        "Descripcion de producto"
-    ],
-    "E-928420.mp3": [
-        "Opciones de pago",
-        "Stock de productos"
-    ]
-}''', language="json")
