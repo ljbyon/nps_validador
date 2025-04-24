@@ -4,17 +4,17 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 
-st.set_page_config(page_title="Evaluador de Clasificación Multi-Etiqueta", layout="wide")
+st.set_page_config(page_title="Evaluador de Categorias de Retroalimentacion NPS", layout="wide")
 
-st.title("Evaluador de Clasificación Multi-Etiqueta")
-st.write("Suba los valores reales y los valores predichos para calcular las métricas de precision y recall.")
+st.title("Evaluador de Categorias de Retroalimentacion NPS")
+st.write("Suba los valores reales y los valores inferidos para calcular las métricas de precision y recall.")
 
 # File uploaders
 col1, col2 = st.columns(2)
 with col1:
     actual_file = st.file_uploader("Subir Valores Reales (JSON)", type=["txt", "json"])
 with col2:
-    predicted_file = st.file_uploader("Subir Valores Predichos (JSON)", type=["txt", "json"])
+    predicted_file = st.file_uploader("Subir Valores Inferidos (JSON)", type=["txt", "json"])
 
 def calculate_metrics(actual_dict, predicted_dict):
     """Calculate precision and recall for each filename and global averages."""
@@ -41,7 +41,7 @@ def calculate_metrics(actual_dict, predicted_dict):
         results.append({
             'Archivo': filename,
             'Categorias Verdad': list(actual_labels),
-            'Categorias LLM': list(predicted_labels),
+            'Categorias Inferidas': list(predicted_labels),
             'Total': len(actual_labels),  # Total number of labels in ground truth
             'Correctas': found_correct,
             'Incorrectas': found_incorrect,
@@ -102,12 +102,12 @@ if actual_file and predicted_file:
             )
         
         # Add explanation of metrics (permanently visible)
-        st.subheader("Entendiendo las Métricas")
+        st.subheader("Leyenda")
         st.markdown("""
-        * **Total**: Número de etiquetas en los valores reales
-        * **Correctas**: Etiquetas predichas correctamente
-        * **Incorrectas**: Etiquetas predichas incorrectamente
-        * **No Encontradas**: Etiquetas que debieron ser predichas pero no lo fueron
+        * **Total**: Número de categorias en los valores reales
+        * **Correctas**: Categorias inferidas correctamente
+        * **Incorrectas**: Categorias inferidas incorrectamente
+        * **No Encontradas**: Categorias que no se encontraron
         * **Recall**: Correctas / (Correctas + No Encontradas)
         * **Precision**: Correctas / (Correctas + Incorrectas)
         """)
