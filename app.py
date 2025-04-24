@@ -18,7 +18,9 @@ def normalize_data(data_dict):
         # Normalize each value in the list
         normalized_values = [normalize_text(value) for value in values]
         normalized_dict[normalized_key] = normalized_values
-    return normalized_dictimport streamlit as st
+    return normalized_dict
+
+import streamlit as st
 import json
 import pandas as pd
 import numpy as np
