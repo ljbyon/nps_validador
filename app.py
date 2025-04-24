@@ -28,23 +28,23 @@ def calculate_metrics(actual_dict, predicted_dict):
         actual_labels = set(actual_dict.get(filename, []))
         predicted_labels = set(predicted_dict.get(filename, []))
         
-        # Calculate metrics
-        true_positives = len(actual_labels & predicted_labels)  # Intersection
-        false_positives = len(predicted_labels - actual_labels)  # In predicted but not in actual
-        false_negatives = len(actual_labels - predicted_labels)  # In actual but not in predicted
+        # Calculate metrics with user-friendly terminology
+        found_correct = len(actual_labels & predicted_labels)  # Intersection
+        found_incorrect = len(predicted_labels - actual_labels)  # In predicted but not in actual
+        not_found = len(actual_labels - predicted_labels)  # In actual but not in predicted
         
         # Calculate precision and recall
-        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
-        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
+        precision = found_correct / (found_correct + found_incorrect) if (found_correct + found_incorrect) > 0 else 0
+        recall = found_correct / (found_correct + not_found) if (found_correct + not_found) > 0 else 0
         
-        # Store results
+        # Store results with user-friendly terminology
         results.append({
             'Filename': filename,
             'Actual Labels': list(actual_labels),
             'Predicted Labels': list(predicted_labels),
-            'True Positives': true_positives,
-            'False Positives': false_positives,
-            'False Negatives': false_negatives,
+            'Found Correct': found_correct,
+            'Found Incorrect': found_incorrect,
+            'Not Found': not_found,
             'Precision': precision,
             'Recall': recall
         })
@@ -88,6 +88,15 @@ if actual_file and predicted_file:
         
         # Detailed view (expandable)
         with st.expander("Show Detailed Analysis"):
+            # Add explanation of terms
+            st.write("""
+            **Understanding the metrics:**
+            - **Found Correct**: Labels that were correctly predicted
+            - **Found Incorrect**: Labels that were incorrectly predicted
+            - **Not Found**: Labels that should have been predicted but weren't
+            - **Precision**: Found Correct / (Found Correct + Found Incorrect)
+            - **Recall**: Found Correct / (Found Correct + Not Found)
+            """)
             st.dataframe(results_df, use_container_width=True)
             
             # Download button for results
