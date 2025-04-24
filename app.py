@@ -28,17 +28,17 @@ from io import StringIO
 import unicodedata
 import re
 
-st.set_page_config(page_title="Evaluador de Clasificación Multi-Etiqueta", layout="wide")
+st.set_page_config(page_title="Evaluador de Clasificacion de Categorias de Retroalimentacion NPS", layout="wide")
 
-st.title("Evaluador de Clasificación Multi-Etiqueta")
-st.write("Suba los valores reales y los valores predichos para calcular las métricas de precision y recall.")
+st.title("Evaluador de Clasificacion de Categorias de Retroalimentacion NPS")
+st.write("Suba los valores reales y los valores inferidos para calcular las métricas de precision y recall.")
 
 # File uploaders
 col1, col2 = st.columns(2)
 with col1:
     actual_file = st.file_uploader("Subir Valores Reales (JSON)", type=["txt", "json"])
 with col2:
-    predicted_file = st.file_uploader("Subir Valores Predichos (JSON)", type=["txt", "json"])
+    predicted_file = st.file_uploader("Subir Valores Inferidos (JSON)", type=["txt", "json"])
 
 def calculate_metrics(actual_dict, predicted_dict):
     """Calculate precision and recall for each filename and global averages."""
@@ -72,13 +72,13 @@ def calculate_metrics(actual_dict, predicted_dict):
         
         # Store results with user-friendly terminology
         results.append({
-            'Filename': filename,
-            'Actual Labels': [normalize_text(label) for label in actual_labels],
-            'Predicted Labels': [normalize_text(label) for label in predicted_labels],
-            'Total Labels': len(actual_labels),  # Total number of labels in ground truth
-            'Found Correct': found_correct,
-            'Found Incorrect': found_incorrect,
-            'Not Found': not_found,
+            'Archivo': filename,
+            'Categorias Verdad': [normalize_text(label) for label in actual_labels],
+            'Categorias Inferidas': [normalize_text(label) for label in predicted_labels],
+            'Total': len(actual_labels),  # Total number of labels in ground truth
+            'Correctos': found_correct,
+            'Incorrectos': found_incorrect,
+            'No Encontrados': not_found,
             'Precision': precision,
             'Recall': recall
         })
@@ -127,7 +127,7 @@ if actual_file and predicted_file:
         st.header("Métricas por Archivo")
         
         # Create a more compact view of the results
-        display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
+        display_df = results_df[['Archivo', 'Recall', 'Precision']].copy()
         # Ensure the display DataFrame maintains the same sorting
         st.dataframe(display_df, use_container_width=True)
         
@@ -147,12 +147,12 @@ if actual_file and predicted_file:
         # Add explanation of metrics (permanently visible)
         st.subheader("Entendiendo las Métricas")
         st.markdown("""
-        * **Total Labels**: Número de etiquetas en los valores reales
-        * **Found Correct**: Etiquetas predichas correctamente
-        * **Found Incorrect**: Etiquetas predichas incorrectamente
-        * **Not Found**: Etiquetas que debieron ser predichas pero no lo fueron
-        * **Recall**: Found Correct / (Found Correct + Not Found)
-        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
+        * **Total**: Número total de categorias
+        * **Correctos**: Categorias inferidas correctamente
+        * **Incorrectos**: Categorias inferidas incorrectamente
+        * **No Encontrados**: Categorias no inferidas
+        * **Recall**: Correctos / (Correctos + No Encontrados)
+        * **Precision**: Correctos / (Correctos + Incorrectos)
         """)
             
     except Exception as e:
