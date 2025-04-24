@@ -76,15 +76,15 @@ if actual_file and predicted_file:
         st.header("Global Metrics")
         metric_col1, metric_col2 = st.columns(2)
         with metric_col1:
-            st.metric("Global Precision", f"{global_precision:.4f}")
-        with metric_col2:
             st.metric("Global Recall", f"{global_recall:.4f}")
+        with metric_col2:
+            st.metric("Global Precision", f"{global_precision:.4f}")
         
         # Display per-filename metrics
         st.header("Per-Filename Metrics")
         
         # Create a more compact view of the results
-        display_df = results_df[['Filename', 'Precision', 'Recall']].copy()
+        display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
         st.dataframe(display_df, use_container_width=True)
         
         # Detailed view (expandable)
@@ -96,8 +96,8 @@ if actual_file and predicted_file:
             - **Found Correct**: Labels that were correctly predicted
             - **Found Incorrect**: Labels that were incorrectly predicted
             - **Not Found**: Labels that should have been predicted but weren't
-            - **Precision**: Found Correct / (Found Correct + Found Incorrect)
             - **Recall**: Found Correct / (Found Correct + Not Found)
+            - **Precision**: Found Correct / (Found Correct + Found Incorrect)
             """)
             st.dataframe(results_df, use_container_width=True)
             
