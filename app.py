@@ -50,6 +50,10 @@ def calculate_metrics(actual_dict, predicted_dict):
         actual_labels = set(actual_dict.get(filename, []))
         predicted_labels = set(predicted_dict.get(filename, []))
         
+        # Ensure all label strings are normalized
+        actual_labels = {normalize_text(label) for label in actual_labels}
+        predicted_labels = {normalize_text(label) for label in predicted_labels}
+        
         # Calculate metrics with user-friendly terminology
         found_correct = len(actual_labels & predicted_labels)  # Intersection
         found_incorrect = len(predicted_labels - actual_labels)  # In predicted but not in actual
@@ -62,8 +66,8 @@ def calculate_metrics(actual_dict, predicted_dict):
         # Store results with user-friendly terminology
         results.append({
             'Filename': filename,
-            'Actual Labels': list(actual_labels),
-            'Predicted Labels': list(predicted_labels),
+            'Actual Labels': [normalize_text(label) for label in actual_labels],
+            'Predicted Labels': [normalize_text(label) for label in predicted_labels],
             'Total Labels': len(actual_labels),  # Total number of labels in ground truth
             'Found Correct': found_correct,
             'Found Incorrect': found_incorrect,
