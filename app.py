@@ -85,6 +85,7 @@ if actual_file and predicted_file:
         
         # Create a more compact view of the results
         display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
+        # Ensure the display DataFrame maintains the same sorting
         st.dataframe(display_df, use_container_width=True)
         
         # Detailed view (expandable)
