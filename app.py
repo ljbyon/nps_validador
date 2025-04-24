@@ -42,6 +42,7 @@ def calculate_metrics(actual_dict, predicted_dict):
             'Filename': filename,
             'Actual Labels': list(actual_labels),
             'Predicted Labels': list(predicted_labels),
+            'Total Labels': len(actual_labels),  # Total number of labels in ground truth
             'Found Correct': found_correct,
             'Found Incorrect': found_incorrect,
             'Not Found': not_found,
@@ -91,6 +92,7 @@ if actual_file and predicted_file:
             # Add explanation of terms
             st.write("""
             **Understanding the metrics:**
+            - **Total Labels**: Number of labels in the ground truth
             - **Found Correct**: Labels that were correctly predicted
             - **Found Incorrect**: Labels that were incorrectly predicted
             - **Not Found**: Labels that should have been predicted but weren't
