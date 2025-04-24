@@ -4,17 +4,17 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 
-st.set_page_config(page_title="Multi-Label Classification Evaluator", layout="wide")
+st.set_page_config(page_title="Evaluador de Clasificación Multi-Etiqueta", layout="wide")
 
-st.title("Multi-Label Classification Evaluator")
-st.write("Upload actual values and predicted values to calculate precision and recall metrics.")
+st.title("Evaluador de Clasificación Multi-Etiqueta")
+st.write("Suba los valores reales y los valores predichos para calcular las métricas de precision y recall.")
 
 # File uploaders
 col1, col2 = st.columns(2)
 with col1:
-    actual_file = st.file_uploader("Upload Actual Values (JSON)", type=["txt", "json"])
+    actual_file = st.file_uploader("Subir Valores Reales (JSON)", type=["txt", "json"])
 with col2:
-    predicted_file = st.file_uploader("Upload Predicted Values (JSON)", type=["txt", "json"])
+    predicted_file = st.file_uploader("Subir Valores Predichos (JSON)", type=["txt", "json"])
 
 def calculate_metrics(actual_dict, predicted_dict):
     """Calculate precision and recall for each filename and global averages."""
@@ -73,15 +73,15 @@ if actual_file and predicted_file:
         results_df, global_precision, global_recall = calculate_metrics(actual_dict, predicted_dict)
         
         # Display global metrics
-        st.header("Global Metrics")
+        st.header("Métricas Globales")
         metric_col1, metric_col2 = st.columns(2)
         with metric_col1:
-            st.metric("Global Recall", f"{global_recall:.4f}")
+            st.metric("Recall Global", f"{global_recall:.4f}")
         with metric_col2:
-            st.metric("Global Precision", f"{global_precision:.4f}")
+            st.metric("Precision Global", f"{global_precision:.4f}")
         
         # Display per-filename metrics
-        st.header("Per-Filename Metrics")
+        st.header("Métricas por Archivo")
         
         # Create a more compact view of the results
         display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
@@ -89,29 +89,29 @@ if actual_file and predicted_file:
         st.dataframe(display_df, use_container_width=True)
         
         # Detailed view (expandable)
-        with st.expander("Show Detailed Analysis"):
+        with st.expander("Mostrar Análisis Detallado"):
             st.dataframe(results_df, use_container_width=True)
             
             # Download button for results
             csv = results_df.to_csv(index=False)
             st.download_button(
-                label="Download Results as CSV",
+                label="Descargar Resultados como CSV",
                 data=csv,
                 file_name="classification_metrics.csv",
                 mime="text/csv"
             )
         
         # Add explanation of metrics (permanently visible)
-        st.subheader("Understanding the Metrics")
+        st.subheader("Entendiendo las Métricas")
         st.markdown("""
-        * **Total Labels**: Number of labels in the ground truth
-        * **Found Correct**: Labels that were correctly predicted
-        * **Found Incorrect**: Labels that were incorrectly predicted
-        * **Not Found**: Labels that should have been predicted but weren't
+        * **Total Labels**: Número de etiquetas en los valores reales
+        * **Found Correct**: Etiquetas predichas correctamente
+        * **Found Incorrect**: Etiquetas predichas incorrectamente
+        * **Not Found**: Etiquetas que debieron ser predichas pero no lo fueron
         * **Recall**: Found Correct / (Found Correct + Not Found)
         * **Precision**: Found Correct / (Found Correct + Found Incorrect)
         """)
             
     except Exception as e:
-        st.error(f"Error processing files: {str(e)}")
-        st.write("Please ensure the uploaded files contain valid JSON data with the expected format.")
+        st.error(f"Error al procesar archivos: {str(e)}")
+        st.write("Por favor, asegúrese de que los archivos subidos contienen datos JSON válidos con el formato esperado.")
