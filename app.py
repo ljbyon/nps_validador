@@ -39,13 +39,13 @@ def calculate_metrics(actual_dict, predicted_dict):
         
         # Store results with user-friendly terminology
         results.append({
-            'Filename': filename,
-            'Actual Labels': list(actual_labels),
-            'Predicted Labels': list(predicted_labels),
-            'Total Labels': len(actual_labels),  # Total number of labels in ground truth
-            'Found Correct': found_correct,
-            'Found Incorrect': found_incorrect,
-            'Not Found': not_found,
+            'Archivo': filename,
+            'Categorias Verdad': list(actual_labels),
+            'Categorias LLM': list(predicted_labels),
+            'Total': len(actual_labels),  # Total number of labels in ground truth
+            'Correctas': found_correct,
+            'Incorrectas': found_incorrect,
+            'No Encontradas': not_found,
             'Precision': precision,
             'Recall': recall
         })
@@ -84,7 +84,7 @@ if actual_file and predicted_file:
         st.header("Métricas por Archivo")
         
         # Create a more compact view of the results
-        display_df = results_df[['Filename', 'Recall', 'Precision']].copy()
+        display_df = results_df[['Archivo', 'Recall', 'Precision']].copy()
         # Ensure the display DataFrame maintains the same sorting
         st.dataframe(display_df, use_container_width=True)
         
@@ -104,12 +104,12 @@ if actual_file and predicted_file:
         # Add explanation of metrics (permanently visible)
         st.subheader("Entendiendo las Métricas")
         st.markdown("""
-        * **Total Labels**: Número de etiquetas en los valores reales
-        * **Found Correct**: Etiquetas predichas correctamente
-        * **Found Incorrect**: Etiquetas predichas incorrectamente
-        * **Not Found**: Etiquetas que debieron ser predichas pero no lo fueron
-        * **Recall**: Found Correct / (Found Correct + Not Found)
-        * **Precision**: Found Correct / (Found Correct + Found Incorrect)
+        * **Total**: Número de etiquetas en los valores reales
+        * **Correctas**: Etiquetas predichas correctamente
+        * **Incorrectas**: Etiquetas predichas incorrectamente
+        * **No Encontradas**: Etiquetas que debieron ser predichas pero no lo fueron
+        * **Recall**: Correctas / (Correctas + No Encontradas)
+        * **Precision**: Correctas / (Correctas + Incorrectas)
         """)
             
     except Exception as e:
