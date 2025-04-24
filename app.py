@@ -119,7 +119,7 @@ if actual_file and predicted_file:
             
         # Display excluded filenames
         if excluded_filenames:
-            st.warning(f"**Archivos Excluidos de la Evaluación:** {len(excluded_filenames)} archivos presentes en los valores reales pero no en las predicciones no fueron evaluados.")
+            st.warning(f"**Archivos Excluidos de la Evaluación:** {len(excluded_filenames)} archivos no fueron evaluados.")
             with st.expander("Ver Archivos Excluidos"):
                 st.write(", ".join(sorted(excluded_filenames)) if excluded_filenames else "Ninguno")
         
